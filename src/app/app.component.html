@@ -1,20 +1,542 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
+<div class="container header-section">
+  <header>
+    <div class="row">
+      <div class="col-sm-6 first">
+        <img src="./assets/images/hyfn_logo.png" class="img-responsive main-logo" alt="HYFN Logo">
+      </div>
+      <div class="col-sm-6 last bottom-align">
+        <div class="sub_title">Digital creative request</div>
+      </div>
+    </div>
+  </header>
 </div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<div class="container formBg">
+  <section>
+    <div class="row">
+      <div class="col-sm-6 first">
+        <div class="push-down">
+          <div class="media">
+            <div class="media-left media-middle hidden-xs">
+              <img class="media-object" src="./assets/images/clock.png" alt="clock image">
+            </div>
+            <div class="media-body">
+              <div class="yelloHeading media-heading">Digital Ad Turn Times </div>
+              <ul>
+                <li>Static Image Ads: <strong>1-2 Business Days</strong></li>
+                <li>Standard HTML5 Ads: <strong>3-5 Business Days</strong></li>
+                <li>Rich Media/Custom Ads: <strong>5-7 Business Days</strong></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 last">
+        <div class="push-down">
+          <div class="media">
+            <div class="media-left media-middle hidden-xs">
+              <img class="media-object" src="./assets/images/stopwatch.png" alt="">
+            </div>
+            <div class="media-body">
+              <div class="yelloHeading media-heading"> Digital Ad start times</div>
+              Digital ad times start upon receiving necessary assets and signed IO.
+              <br><span class="redFont">Submissions after 1pm CST will begin next day.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div *ngIf="!showThankyou">
+    <section>
+      <div class="row section-padding">
+        <div class="col-sm-12 text-center">
+          <div class="titleSections">
+            <span class="headinBG">PHNX ID</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+          <div class="input-group text-center">
+            <input type="text" class="form-control" [(ngModel)]="phnxID" [disabled]="phnxIDValid" (focus)="phnxIDErr=false" [pattern]="phnxPattern" maxlength="6">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" (click)="onImportPHNX()" [disabled]="phnxIDValid">Validate</button>
+                          </span>
+          </div>
+          <div class="phnx_err" *ngIf="phnxIDErr"><small>The PHNX ID <em>{{phnxID}}</em> did not retrive an associated project.<br>Please check ID</small></div>
+          <!-- /input-group -->
+        </div>
+      </div>
+    </section>
+    <form id='fullForm' *ngIf="phnxIDValid" [formGroup]="mainForm" (ngSubmit)="onSubmitBtn()">
+      <section>
+        <!-- Account Executive -->
+        <div class="row section-padding">
+          <div class="col-sm-12 text-center">
+            <div class="titleSections">
+              <span class="headinBG">ACCOUNT EXECUTIVE</span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 first">
+            <fieldset>
+              <label>Account Executive Name *</label>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label for="executiveName" class="sr-only">Full Name</label>
+                    <input type="text" name="ae_fname" id="executiveName" class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['executiveName'].invalid && showErrors}" placeholder="Full Name" formControlName="executiveName">
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 first">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="executiveEmail">Account Executive Email *</label>
+                  <input type="text" name="ae_email" id="executiveEmail" class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['executiveEmail'].invalid && showErrors}" formControlName="executiveEmail">
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="executivePhone">Account Executive Phone *</label>
+                  <input type="text" name="ae_phone" id="executivePhone" class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['executivePhone'].invalid && showErrors}" formControlName="executivePhone">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 last">
+            <div class="form-group extra-field">
+              <label for="extraEmails">Additional Emails for Campaign Associates</label>
+              <input type="text" name="additional_emails" id='extraEmails' class="form-control" placeholder="Separate by Comma:  aliceregby@federatedmedia.net, jerryblack@lindigital.com" formControlName="additionalEmails">
+            </div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <!-- Ad Campaigns -->
+        <div class="row section-padding">
+          <div class="col-sm-12 text-center">
+            <div class="titleSections">
+              <span class="headinBG">Campaign Details</span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 first">
+            <div class="form-group">
+              <label for="clientName">Client Name *</label>
+              <input type="text" name="client_name" class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['clientName'].invalid && showErrors}" id="clientName" formControlName="clientName">
+            </div>
+            <div class="form-group">
+              <label for="campaignName">Campaign Name *</label>
+              <input type="text" name="campaign_name" class="required-item form-control" id="campaignName" formControlName="campaignName">
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="campaignKPI">Campaign KPI/Metric Goals *</label>
+                  <input type="text" name="campaign_kpi" class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['campaignKPI'].invalid && showErrors}" id="campaignKPI" formControlName="campaignKPI">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="campaignStartDate">Campaign Start Date *</label>
+                  <input type="text" name="date_start" class="required-item form-control calendar" [ngClass]="{'missingInfo': mainForm.controls['campaignStartDate'].invalid && showErrors}" id="campaignStartDate" formControlName="campaignStartDate" bsDatepicker [bsConfig]="bsConfig" #dpStart="bsDatepicker" (bsValueChange)="changeEndDate($event)">
 
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group extra-field">
+                  <label for="assetDelivery">Asset Delivery Deadline</label>
+                  <input type="text" name="date_asset" class="form-control" id="assetDelivery" readonly placeholder="Autofill from Campaign Start Date" formControlName="campaignAssetsDate">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="campaignEndDate">Campaign End Date *</label>
+                  <input type="text" name="date_end" class="required-item form-control calendar" [ngClass]="{'missingInfo': mainForm.controls['campaignEndDate'].invalid && showErrors}" id="campaignEndDate" formControlName="campaignEndDate" bsDatepicker [minDate]="endCampDate" [bsConfig]="bsConfig" #dpEnd="bsDatepicker">
+                  <!-- ngx-mydatepicker [options]="dateEndOptions" #dpEnd="ngx-mydatepicker" (focus)="dpEnd.openCalendar()" (dateChanged)="onEndDateChanged($event)"> -->
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="clientWebsite">Client Website *</label>
+              <input type="text" name="client_web" id="clientWebsite" class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['clientWebsite'].invalid && showErrors}" formControlName="clientWebsite">
+            </div>
+            <div class="form-group">
+              <label for="campaignMsgPrimary">Primary Message * 
+                <!-- <span  tooltip="Info on Primary Message"class="glyphicon glyphicon-question-sign"></span> -->
+              </label>
+              <textarea class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['campaignMsgPrimary'].invalid && showErrors}" name="msg_primary" id="campaignMsgPrimary" rows="3" formControlName="campaignMsgPrimary"></textarea>
+            </div>
+            <div class="form-group extra-field">
+              <label for="secondaryMessage">Secondary Message</label>
+              <textarea class="form-control" name="msg_secondary" id="secondaryMessage" rows="3" formControlName="campaignMsgSecondary"></textarea>
+            </div>
+          </div>
+          <div class="col-sm-6 last">
+            <div class="form-group" id="clicksContainer">
+              <label for="adClickThrough">Ad URL ClickThrough(s) Link</label>
+              <div formArrayName="exists" *ngFor="let item of exitFormArray.controls; let i = index;">
+                <div class="input-group clickthroughs" [formGroupName]="i">
+                  <span class="input-group-addon">Name</span>
+                  <input type="text" class="form-control" formControlName="exitName" />
+                  <span class="input-group-addon" style="border-left: 0; border-right: 0;">URL</span>
+                  <input type="text" class="form-control" formControlName="exitUrl" placeholder="www.google.com" />
+                  <span class="input-group-btn" *ngIf="i == 0">
+                                        <button class="btn" id="clickthroughBtn" type="button" (click)="addNewExit()">
+                                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                  <span class="sr-only">Add More</span>
+                  </button>
+                  </span>
+                  <span class="input-group-btn" *ngIf="i > 0">
+                                        <button class="btn" type="button" (click)="removeExit(i)">
+                                            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                  <span class="sr-only">Remove</span>
+                  </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="campaignTarget">Target Audience/Market *</label>
+              <textarea class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['campaignTarget'].invalid && showErrors}" name="target_audience" id="campaignTarget" rows="3" formControlName="campaignTarget"></textarea>
+            </div>
+            <!--    <div class="form-group extra-field">
+              <label for="additionalNotes">Additional Notes</label>
+              <textarea class="form-control" name="aditional_notes" id="additionalNotes" rows="3" formControlName="campaignNotes"></textarea>
+            </div> -->
+            <section>
+              <div class="row section-padding">
+                <div class="col-sm-12 text-center">
+                  <div class="titleSections">
+                    <span class="headinBG">Creative Ad Type</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <div class="dropdown numberVersions">
+                      <label for="numVersions">Number of Versions</label>
+                      <div class="btn-group" dropdown>
+                        <button value="1" type="button" data-toggle="dropdown" id="numVersions" aria-haspopup="true" aria-expanded="false" class="btn dropdown-toggle">{{creativeCount}}</button>
+                        <button type="button" data-toggle="dropdown" id="numVersionsCar" aria-haspopup="true" aria-expanded="false" class="btn dropdown-toggle" dropdownToggle>
+                          <span class="caret"></span>
+                          <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="numVersions" *dropdownMenu>
+                          <li (click)="onCreativeCount(1)">
+                            <div class="list-Item">1</div>
+                          </li>
+                          <li (click)="onCreativeCount(2)">
+                            <div class="list-Item">2</div>
+                          </li>
+                          <li (click)="onCreativeCount(3)">
+                            <div class="list-Item">3</div>
+                          </li>
+                          <li (click)="onCreativeCount(4)">
+                            <div class="list-Item">4</div>
+                          </li>
+                          <li (click)="onCreativeCount(5)">
+                            <div class="list-Item">5</div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <section class="creative_types">
+                  <div id="creativeAdBlock">
+                    <label for="">Creative Ad *</label>
+                    <div [ngClass]="{'missingInfo': showErrors && !validCreatives}">
+                      <div id="crativeSelection" class="crativeSelection">
+                        <div class="row no-gutter">
+                          <div class="col-sm-4">
+                            <button type="button" id="static_btn" class="btn" [ngClass]="{'active': activeCrvType == 'static' || setActiveIfCrv('static')}" (click)="setActiveType('static')">Static/Social</button>
+                          </div>
+                          <div class="col-sm-4">
+                            <button type="button" id="std_btn" class="btn" [ngClass]="{'active': activeCrvType == 'standard' || setActiveIfCrv('standard')}" (click)="setActiveType('standard')">Standard</button>
+                          </div>
+                          <div class="col-sm-4">
+                            <button type="button" id="rm_btn" class="btn" [ngClass]="{'active': activeCrvType == 'richmedia' || setActiveIfCrv('richmedia')}" (click)="setActiveType('richmedia')">Rich Media</button>
+                          </div>
+                          <!--         <div class="col-sm-3">
+                                                        <button type="button" id="mobile_btn" class="btn">Mobile</button>
+                                                    </div> -->
+                        </div>
+                      </div>
+                      <div class="creativeSizes" formGroupName="creatives">
+                        <!-- dynamic section -->
+                        <!--Static Options -->
+                        <div class="row static_btn-row crv-type" [ngClass]="{'active': activeCrvType == 'static'}" formGroupName="static">
+                          <div class="col-xs-6 col-md-4">
+                            <div class="checkBoxFill">
+                              <input type="checkbox" id="stat_300x250" value="300x250" formControlName="static_300x250" name="static" (change)="checkChanged($event)" />
+                              <label for="stat_300x250">300x250</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" id="stat_728x90" value="728x90" formControlName="static_728x90" name="static" (change)="checkChanged($event)" />
+                              <label for="stat_728x90">728x90</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" id="stat_160x600" value="160x600" formControlName="static_160x600" name="static" (change)="checkChanged($event)" />
+                              <label for="stat_160x600">160x600</label>
+                            </div>
+                          </div>
+                          <div class="col-xs-6 col-md-4">
+                            <div class="checkBoxFill">
+                              <input type="checkbox" id="stat_600x600" value="600x600" formControlName="static_600x600" name="static" (change)="checkChanged($event)" />
+                              <label for="stat_600x600">600x600</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" id="stat_1200x444" value="1200x444" formControlName="static_1200x444" name="static" (change)="checkChanged($event)" />
+                              <label for="stat_1200x444">1200x444</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" id="stat_1200x628" value="1200x628" formControlName="static_1200x628" name="static" (change)="checkChanged($event)" />
+                              <label for="stat_1200x628">1200x628</label>
+                            </div>
+                          </div>
+                          <div class="col-xs-6 col-md-4">
+                            <div class="checkBoxFill">
+                              <input type="checkbox" id="stat_320x50" value="320x50" formControlName="static_320x50" name="static" (change)="checkChanged($event)" />
+                              <label for="stat_320x50">320x50</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" id="stat_300x50" value="300x50" formControlName="static_300x50" name="static" (change)="checkChanged($event)" />
+                              <label for="stat_300x50">300x50</label>
+                            </div>
+                          </div>
+                        </div>
+                        <!--Standard Options -->
+                        <div class="row std_btn-row crv-type" [ngClass]="{'active': activeCrvType == 'standard'}" formGroupName="standard">
+                          <div class="col-xs-6 col-md-4">
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="300x250" formControlName="standard_300x50" id="std_300x250" name="standard" (change)="checkChanged($event)" />
+                              <label for="std_300x250">300x250</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="728x90" formControlName="standard_728x90" id="std_728x90" name="standard" (change)="checkChanged($event)" />
+                              <label for="std_728x90">728x90</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="160x600" formControlName="standard_160x600" id="std_160x600" name="standard" (change)="checkChanged($event)" />
+                              <label for="std_160x600">160x600</label>
+                            </div>
+                          </div>
+                          <div class="col-xs-6 col-md-4">
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="300x600" formControlName="standard_300x600" id="std_300x600" name="standard" (change)="checkChanged($event)" />
+                              <label for="std_300x600">300x600</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="970x90" formControlName="standard_970x90" id="std_970x90" name="standard" (change)="checkChanged($event)" />
+                              <label for="std_970x90">970x90</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="970x250" formControlName="standard_970x250" id="std_970x250" name="standard" (change)="checkChanged($event)" />
+                              <label for="std_970x250">970x250</label>
+                            </div>
+                          </div>
+                          <div class="col-xs-6 col-md-4">
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="320x50" formControlName="standard_320x50" id="std_320x50" name="standard" (change)="checkChanged($event)" />
+                              <label for="std_320x50">320x50</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="300x50" formControlName="standard_300x50" id="std_300x50" name="standard" (change)="checkChanged($event)" />
+                              <label for="std_300x50">300x50</label>
+                            </div>
+                          </div>
+                        </div>
+                        <!--RM Options -->
+                        <div class="row rm_btn-row crv-type" [ngClass]="{'active': activeCrvType == 'richmedia'}" formGroupName="richmedia">
+                          <div class="col-xs-6 col-md-4">
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="300x250" formControlName="richmedia_300x250" id="rm_300x250" name="richmedia" (change)="checkChanged($event)" />
+                              <label for="rm_300x250">300x250</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="728x90" formControlName="richmedia_728x90" id="rm_728x90" name="richmedia" (change)="checkChanged($event)" />
+                              <label for="rm_728x90">728x90</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="160x600" formControlName="richmedia_160x600" id="rm_160x600" name="richmedia" (change)="checkChanged($event)" />
+                              <label for="rm_160x600">160x600</label>
+                            </div>
+                          </div>
+                          <div class="col-xs-6 col-md-4">
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="300x600" formControlName="richmedia_300x600" id="rm_300x600" name="richmedia" (change)="checkChanged($event)" />
+                              <label for="rm_300x600">300x600</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="970x250" formControlName="richmedia_970x250" id="rm_970x250" name="richmedia" />
+                              <label for="rm_970x250">970x250</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="300x600_Exp" formControlName="richmedia_300x600Exp" id="rm_300x600_Exp" name="richmedia" (change)="checkChanged($event)" />
+                              <label for="rm_300x600_Exp">300x600_Exp</label>
+                            </div>
+                          </div>
+                          <div class="col-xs-6 col-md-4">
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="728x315_Exp" formControlName="richmedia_728x315Exp" id="rm_728x315_Exp" name="richmedia" (change)="checkChanged($event)" />
+                              <label for="rm_728x315_Exp">728x315_Exp</label>
+                            </div>
+                            <div class="checkBoxFill">
+                              <input type="checkbox" value="500x250_Exp" formControlName="richmedia_500x250Exp" id="rm_500x250_Exp" name="richmedia" (change)="checkChanged($event)" />
+                              <label for="rm_500x250_Exp">500x250_Exp</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <div class="form-group">
+                        <label for="notesCreativesSet">Additional Notes or Asset Link</label>
+                        <textarea class="form-control" name="" id="notesCreativesSet" rows="5" formControlName="crvNotes"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end of dynamic section -->
+                </section>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="row section-padding">
+          <div class="col-sm-12 text-center">
+            <div class="titleSections">
+              <span class="headinBG">Creative Assets</span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 first">
+            <div class="yelloHeading">Design direction</div>
+            <ul>
+              <li>Previous print or digital ad campagin for your brand</li>
+              <li>Completed designs to be developed into finished digital ads</li>
+              <li>Brand guidelines if applicable</li>
+              <li>Brand Logo: vector .eps - .ai preferred. Transparent .png acceptable</li>
+              <li>Brand Fonts: variety of font types are accepted</li>
+            </ul>
+            <div class="yelloHeading">Source files accepted</div>
+            <ul>
+              <li>Photoshop (.psd): Layered with font files</li>
+              <li>Illustrator (.ai): Links and font files</li>
+              <li>Indesign (.indd): Links and font files</li>
+              <li>Video: Up to 30 seconds unless approved.</li>
+              <li>Assets for approved custom functionality</li>
+            </ul>
+          </div>
+          <div class="col-sm-6 last">
+            <div class="yelloHeading">Copy direction</div>
+            <p>We will need something to start with for messaging. Our team will make any edits or adjustments based on our recommendations and best practices, but we still need something from the client to get started.</p>
+            <ul>
+              <li>Client provided layouts. Used exactly as appears in provided designs</li>
+              <li>Previous work samples</li>
+              <li>Client provided copy, mapping out basic messaging and final CTA</li>
+            </ul>
+            <label class="btn btn-block btn-file lg_ylwBtn">
+              <img class="iconBtn" src="./assets/images/upload_icon.png">Upload Files
+              <input type="file" ngFileSelect [options]="uploadOptions" (uploadOutput)="onUploadOutput($event)" [uploadInput]="uploadInput" style="display: none;" multiple>
+            </label>
+            <div class="form-group">
+              <div class="uploadResults small text-muted" id="filesUploadStat" *ngIf="filesToUpload.length > 0">
+                <ul class="listFilesUpload">
+                  <li class="uploadFileName" *ngFor="let item of filesToUpload; let i = index;" (click)="removeFile(item.id)">
+                    <span class="glyfChange glyphicon glyphicon-file"></span> {{item.name}} {{overMine}}
+                    <span class="pull-right glyfChange glyphicon glyphicon-remove"></span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- Best Practices  -->
+            <section>
+              <div class="row section-padding">
+                <div class="col-sm-12 text-center">
+                  <div class="titleSections">
+                    <span class="headinBG">Display Ad Best Practices</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-8 col-xs-offset-2">
+                  <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="https://www.youtube-nocookie.com/embed/Se_PWzUkCEs?rel=0" allowfullscreen></iframe>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+      <!-- SUBMIT -->
+      <section>
+        <div class="row">
+          <div class="col-sm-offset-3 col-sm-6 text-center">
+            <button type="submit" value="Submit" id="submitBtn" [disabled]="showProcessing" class="btn-block">Submit form</button>
+            <!-- <button class="btn-block">Submit form</button> [disabled]="showProcessing" -->
+          </div>
+        </div>
+      </section>
+      <!-- </div> -->
+    </form>
+  </div>
+  <div *ngIf="showThankyou">
+    <div class="row">
+      <div class="col-sm-12 text-center">
+        <h1>Thank You!</h1>
+      </div>
+    </div>
+  </div>
+</div>
+<footer class="footer"></footer>
+<div class="stick">
+  <a class="btn btn-danger btn-sm" href="mailto:creativeproduction@hyfnlocal.com?subject=Creative%20Form%20Issue&amp;body=Please%20describe%20the%20issue:"> <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Report Issue</a>
+</div>
+<div id="loader-wrapper" *ngIf="showProcessing">
+  <div id="loader-center">
+    <div class="well well-lg"><span class="form-status">{{formStatus}}</span>
+      <progressbar *ngIf="validCreatives" [animate]="false" [value]="uploadPercent" type="success"><b>{{uploadPercent}}%</b></progressbar>
+    </div>
+  </div>
+</div>
+<!-- <modal-loading></modal-loading> -->
+<div class="modal fade" bsModal #modalElm="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Missing Files?</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalElm.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-center">
+        <strong>File assets are required to start job!</strong>
+        <p>If you have provided assets URL in <em><strong>Additional Notes or Asset Link</strong></em> field, click "Continue" else "Cancel" and add files.</p>
+        <button type="button" class="btn btn-default" (click)="confirmModal()">Continue</button>
+        <button type="button" class="btn btn-default" (click)="cancelModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
