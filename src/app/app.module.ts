@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { AppRoutingModule } from './app-routing';
 
 import { ApiService } from './api.service'; 
  
@@ -22,7 +23,7 @@ import { NumericOnlyDirective } from './numeric-only.directive';
     NumericOnlyDirective
   ],
   imports: [
-    BrowserModule, CommonModule, FormsModule, HttpModule, NgUploaderModule, ReactiveFormsModule, ProgressbarModule.forRoot(), BsDatepickerModule.forRoot(), TooltipModule.forRoot(), ModalModule.forRoot(), BsDropdownModule.forRoot(), Ng2PageScrollModule.forRoot()
+    BrowserModule, AppRoutingModule, CommonModule, FormsModule, HttpModule, NgUploaderModule, ReactiveFormsModule, ProgressbarModule.forRoot(), BsDatepickerModule.forRoot(), TooltipModule.forRoot(), ModalModule.forRoot(), BsDropdownModule.forRoot(), Ng2PageScrollModule.forRoot()
   ],
   providers: [ApiService],
   bootstrap: [AppComponent]

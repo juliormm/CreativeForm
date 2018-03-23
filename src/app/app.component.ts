@@ -1,4 +1,6 @@
 import { Component, OnInit, ContentChild, ViewChild, AfterViewChecked, Inject, ChangeDetectorRef, EventEmitter, Directive, TemplateRef } from '@angular/core';
+import { Router, ActivatedRoute, Params, NavigationExtras } from '@angular/router';
+
 import { DOCUMENT } from '@angular/platform-browser';
 import { FormGroup, FormControl, Validators, FormBuilder, FormArray, ValidatorFn, ValidationErrors, AbstractControl, EmailValidator } from '@angular/forms';
 import { ApiService } from './api.service';
@@ -105,6 +107,8 @@ export interface PhnxDownload {
     target_audience: any[];
     sales_reps: PhnxSales;
     creatives: any[];
+    formID: number;
+    code: number;
 }
 
 @Component({
@@ -114,15 +118,19 @@ export interface PhnxDownload {
 })
 export class AppComponent implements OnInit {
 
+    formID;
     showThankyou = false;
     phnxIDValid = false;
     phnxIDErr = false;
+    oldPhnxIDErr = false;
     showProcessing = false;
     showErrors = false;
     validCreatives = false;
     uploadPercent = 0;
+    tryAnotherID = false;
 
     phnxID: string;
+    prevPhnxID: string;
     mainForm: FormGroup;
     campaignEndDateComp: FormControl;
     phnxPattern = '\d{5,6}';
@@ -148,6 +156,7 @@ export class AppComponent implements OnInit {
     @ViewChild('dpStart') public startDateCal;
     @ViewChild('fileInput') fileInput;
     @ViewChild('modalElm') modalElm;
+    @ViewChild('errorMessages') modalErrs;
 
     bsConfig = { containerClass: 'theme-default' };
     endCampDate = new Date();
@@ -159,7 +168,18 @@ export class AppComponent implements OnInit {
 
     modalRef: BsModalRef;
 
-    constructor(private _api: ApiService, private formBuilder: FormBuilder, public pageScrollService: PageScrollService, @Inject(DOCUMENT) private document: any) {
+    errText: string;
+    errHeader: string;
+
+    formHash$;
+
+    constructor(
+        private _api: ApiService,
+        private formBuilder: FormBuilder,
+        public pageScrollService: PageScrollService, @Inject(DOCUMENT)
+        private document: any,
+        private route: ActivatedRoute,
+        private modalService: BsModalService) {
 
         this.uploadInput = new EventEmitter<UploadInput>(); // input events, we use this to emit data to ngx-uploader
         this.filesToUpload = [];
@@ -171,95 +191,108 @@ export class AppComponent implements OnInit {
 
     ngOnInit() {
         this.hashKey = Math.random().toString(36).substring(7);
-        // this.bsConfig = Object.assign({}, { containerClass: 'theme-default' });
-        // this.modalSub = this._modalService.respondModal$.subscribe((data: ModalYesNoData) => {
-        //     this.modalRespose(data)
-        // })
 
-        // if (this.phnxIDValid) {
-        //     console.log('starting with local data');
-        //     this.phnxData = {
-        //         client: {
-        //             client_id: null,
-        //             client_name: "Dean McCrary Imports",
-        //             client_phnx_id: 21579
-        //         },
-        //         campaign_name: "Dean McCrary Audi",
-        //         am: {
-        //             am_name: "Ronny Latimore",
-        //             am_id: 1,
-        //             am_email: "ronny.latimore@lin-digital.com",
-        //             am_phnx_id: 20372
-        //         },
-        //         owner: null,
-        //         phnx_id: 124947,
-        //         kpi: "CTR",
-        //         id: 0,
-        //         creatives: [
-        //             {
-        //                 size: {
-        //                     std_size: "300x250",
-        //                     custom_size: "300x250",
-        //                     expand_size: null
-        //                 },
-        //                 type: "Static",
-        //                 versionName: null,
-        //                 options: null
-        //             }, {
-        //                 size: {
-        //                     std_size: "728x90",
-        //                     custom_size: "728x90",
-        //                     expand_size: null
-        //                 },
-        //                 type: "Static",
-        //                 versionName: null,
-        //                 options: null
-        //             }, {
-        //                 size: {
-        //                     std_size: "160x600",
-        //                     custom_size: "160x600",
-        //                     expand_size: null
-        //                 },
-        //                 type: "Static",
-        //                 versionName: null,
-        //                 options: null
-        //             }, {
-        //                 size: {
-        //                     std_size: "500x250Exp",
-        //                     custom_size: "300x250",
-        //                     expand_size: '500x250'
-        //                 },
-        //                 type: "Static",
-        //                 versionName: null,
-        //                 options: null
-        //             }, {
-        //                 size: {
-        //                     std_size: "320x50",
-        //                     custom_size: "320x50",
-        //                     expand_size: null
-        //                 },
-        //                 type: "Standard",
-        //                 versionName: null,
-        //                 options: null
-        //             }
-        //         ]
-        //     };
+        this.formHash$ = this.route.queryParams
+            .subscribe((qparam: any) => {
+                if ('ref' in qparam) {
+                    // load campaign
+                    // 
 
-        //     this.buildForm();
-        // }
-
-        // this.campaignEndDateComp.disable();
-        // console.log(this.campaignEndDateComp.disabled);
+                }
+            });
     }
 
-    // showCalendar(dp, name) {
-    //     if (name == 'campaingEndDate' && !this.mainForm.get('campaignEndDate').disabled) {
-    //         dp.toggleCalendar()
-    //     }
-    // }
+    // PHNX calls
+    // 1 - valid
+    // 2 - no creatives
+    // 3 - in progress
+    // 4 - no phnx id found
+    onImportPHNX() {
+
+        if (this.phnxID.length >= 5) {
+            if (this.prevPhnxID != this.phnxID) {
+                this.prevPhnxID = this.phnxID;
+                this.showProcessing = true;
+                this.formStatus = 'Getting Campaign...';
+                this._api.getData('api/am/creative-form/phnx/' + this.phnxID).subscribe((data: PhnxDownload) => {
+
+                    switch (data.code) {
+                        case 1:
+                            this.phnxData = data;
+                            this.formID = data.formID;
+                            this.buildForm();
+                            this.phnxIDValid = true;
+                            break;
+                        case 2:
+                            // no creatives
+                            this.errText = 'No creatives where found on the media plan, make sure the media plan reflects the creatives that need production.';
+                            this.errHeader = 'No Creatives Found!';
+                            this.openModal(this.modalErrs);
+                            break;
+                        case 3:
+                            // in progress
+                            // this.oldPhnxIDErr = true;
+                            this.errText = 'This PHNX ID is already submitted, if you need to update the form, please access the form by using the email sent to you.';
+                            this.errHeader = 'Creative Request In Progress';
+                            this.openModal(this.modalErrs);
+                            break;
+                        case 4:
+                            // no phnx id found
+                            this.phnxIDErr = true;
+                            this.errText = 'Could not find the PHNX ID, please double check the ID';
+                            this.errHeader = 'No Campaign Found!';
+                            this.openModal(this.modalErrs);
+                            this.tryAnotherID = true;
+
+                            break;
+
+                    }
+
+                    this.showProcessing = false;
+                    this.formStatus = 'Saving...';
+                });
+            } else {
+                this.tryAnotherID = true;
+            }
+
+        } else {
+            if (this.prevPhnxID != this.phnxID) {
+                this.prevPhnxID = this.phnxID;
+                this.phnxIDErr = true;
+                this.errText = 'Could not find the PHNX ID, please double check the ID';
+                this.errHeader = 'No Campaign Found!';
+                this.openModal(this.modalErrs);
+            } else {
+                this.tryAnotherID = true;
+            }
+
+        }
+    }
+
+    onPhnxBoxUpKey(event) {
+        if (this.prevPhnxID !== this.phnxID) {
+            // this.oldPhnxIDErr = false;
+            // this.phnxIDErr = false;
+            this.tryAnotherID = false;
+        }
+    }
 
 
 
+
+
+    // New Campaign
+
+
+
+    // Load Campaign
+
+
+
+
+
+
+    //Tools
 
     formatDate(date) {
         return date.getMonth() + 1 + '/' + date.getDate() + '/' + date.getFullYear();
@@ -300,16 +333,16 @@ export class AppComponent implements OnInit {
         const plus2Days = this.addRemoveDays(new Date(), 2);
         const stgDate = plus2Days.getMonth() + 1 + '/' + plus2Days.getDate() + '/' + plus2Days.getFullYear();
         this.mainForm = new FormGroup({
-            executiveName: new FormControl({value: (this.phnxData.sales_reps) ? this.phnxData.sales_reps.first_name + ' ' + this.phnxData.sales_reps.last_name : null, disabled: false}, [Validators.required]),
-            executiveEmail: new FormControl({value: (this.phnxData.sales_reps) ? this.phnxData.sales_reps.email : null, disabled: false}, [Validators.required, Validators.pattern(this.emailPattern)]),
+            executiveName: new FormControl({ value: (this.phnxData.sales_reps) ? this.phnxData.sales_reps.first_name + ' ' + this.phnxData.sales_reps.last_name : null, disabled: false }, [Validators.required]),
+            executiveEmail: new FormControl({ value: (this.phnxData.sales_reps) ? this.phnxData.sales_reps.email : null, disabled: false }, [Validators.required, Validators.pattern(this.emailPattern)]),
             additionalEmails: new FormControl(null),
             executivePhone: new FormControl(null, [Validators.required, Validators.pattern(this.phonePattern)]),
             clientName: new FormControl({ value: baseData.client.client_name, disabled: (baseData.client.client_name) }, [Validators.required]),
             clientWebsite: new FormControl(null, [Validators.required]),
             campaignName: new FormControl({ value: this.phnxData.campaign_name, disabled: true }, [Validators.required]),
             campaignKPI: new FormControl({ value: this.phnxData.kpi, disabled: (this.phnxData.kpi) }, [Validators.required]),
-            campaignStartDate: new FormControl({value: (this.phnxData.media_plan) ? new Date(this.phnxData.media_plan.start_date) : null, disabled: false}, [Validators.required]),
-            campaignEndDate: new FormControl({value: (this.phnxData.media_plan) ? new Date(this.phnxData.media_plan.end_date)  : null, disabled: false}, [Validators.required]),
+            campaignStartDate: new FormControl({ value: (this.phnxData.media_plan) ? new Date(this.phnxData.media_plan.start_date) : null, disabled: false }, [Validators.required]),
+            campaignEndDate: new FormControl({ value: (this.phnxData.media_plan) ? new Date(this.phnxData.media_plan.end_date) : null, disabled: false }, [Validators.required]),
             campaignAssetsDate: new FormControl(stgDate),
             campaignMsgPrimary: new FormControl(null, [Validators.required]),
             campaignMsgSecondary: new FormControl(null),
@@ -320,35 +353,35 @@ export class AppComponent implements OnInit {
             creatives: this.formBuilder.group({
 
                 static: new FormGroup({
-                    static_300x250: new FormControl(this.getCreativeItems('static_300x250')),
-                    static_728x90: new FormControl(this.getCreativeItems('static_728x90')),
-                    static_160x600: new FormControl(this.getCreativeItems('static_160x600')),
-                    static_600x600: new FormControl(this.getCreativeItems('static_600x600')),
-                    static_1200x444: new FormControl(this.getCreativeItems('static_1200x444')),
-                    static_1200x628: new FormControl(this.getCreativeItems('static_1200x628')),
-                    static_320x50: new FormControl(this.getCreativeItems('static_320x50')),
-                    static_300x50: new FormControl(this.getCreativeItems('static_300x50')),
+                    static_300x250: new FormControl({ value: this.getCreativeItems('static_300x250'), disabled: true }),
+                    static_728x90: new FormControl({ value: this.getCreativeItems('static_728x90'), disabled: true }),
+                    static_160x600: new FormControl({ value: this.getCreativeItems('static_160x600'), disabled: true }),
+                    static_600x600: new FormControl({ value: this.getCreativeItems('static_600x600'), disabled: true }),
+                    static_1200x444: new FormControl({ value: this.getCreativeItems('static_1200x444'), disabled: true }),
+                    static_1200x628: new FormControl({ value: this.getCreativeItems('static_1200x628'), disabled: true }),
+                    static_320x50: new FormControl({ value: this.getCreativeItems('static_320x50'), disabled: true }),
+                    static_300x50: new FormControl({ value: this.getCreativeItems('static_300x50'), disabled: true }),
                 }),
 
                 standard: new FormGroup({
-                    standard_300x250: new FormControl(this.getCreativeItems('standard_300x250')),
-                    standard_728x90: new FormControl(this.getCreativeItems('standard_728x90')),
-                    standard_160x600: new FormControl(this.getCreativeItems('standard_160x600')),
-                    standard_300x600: new FormControl(this.getCreativeItems('standard_300x600')),
-                    standard_970x90: new FormControl(this.getCreativeItems('standard_970x90')),
-                    standard_970x250: new FormControl(this.getCreativeItems('standard_970x250')),
-                    standard_320x50: new FormControl(this.getCreativeItems('standard_320x50')),
-                    standard_300x50: new FormControl(this.getCreativeItems('standard_300x50')),
+                    standard_300x250: new FormControl({ value: this.getCreativeItems('standard_300x250'), disabled: true }),
+                    standard_728x90: new FormControl({ value: this.getCreativeItems('standard_728x90'), disabled: true }),
+                    standard_160x600: new FormControl({ value: this.getCreativeItems('standard_160x600'), disabled: true }),
+                    standard_300x600: new FormControl({ value: this.getCreativeItems('standard_300x600'), disabled: true }),
+                    standard_970x90: new FormControl({ value: this.getCreativeItems('standard_970x90'), disabled: true }),
+                    standard_970x250: new FormControl({ value: this.getCreativeItems('standard_970x250'), disabled: true }),
+                    standard_320x50: new FormControl({ value: this.getCreativeItems('standard_320x50'), disabled: true }),
+                    standard_300x50: new FormControl({ value: this.getCreativeItems('standard_300x50'), disabled: true }),
                 }),
                 richmedia: new FormGroup({
-                    richmedia_300x250: new FormControl(this.getCreativeItems('richmedia_300x250')),
-                    richmedia_728x90: new FormControl(this.getCreativeItems('richmedia_728x90')),
-                    richmedia_160x600: new FormControl(this.getCreativeItems('richmedia_160x600')),
-                    richmedia_300x600: new FormControl(this.getCreativeItems('richmedia_300x600')),
-                    richmedia_970x250: new FormControl(this.getCreativeItems('richmedia_970x250')),
-                    richmedia_300x600Exp: new FormControl(this.getCreativeItems('richmedia_300x600Exp')),
-                    richmedia_728x315Exp: new FormControl(this.getCreativeItems('richmedia_728x315Exp')),
-                    richmedia_500x250Exp: new FormControl(this.getCreativeItems('richmedia_500x250Exp'))
+                    richmedia_300x250: new FormControl({ value: this.getCreativeItems('richmedia_300x250'), disabled: true }),
+                    richmedia_728x90: new FormControl({ value: this.getCreativeItems('richmedia_728x90'), disabled: true }),
+                    richmedia_160x600: new FormControl({ value: this.getCreativeItems('richmedia_160x600'), disabled: true }),
+                    richmedia_300x600: new FormControl({ value: this.getCreativeItems('richmedia_300x600'), disabled: true }),
+                    richmedia_970x250: new FormControl({ value: this.getCreativeItems('richmedia_970x250'), disabled: true }),
+                    richmedia_300x600Exp: new FormControl({ value: this.getCreativeItems('richmedia_300x600Exp'), disabled: true }),
+                    richmedia_728x315Exp: new FormControl({ value: this.getCreativeItems('richmedia_728x315Exp'), disabled: true }),
+                    richmedia_500x250Exp: new FormControl({ value: this.getCreativeItems('richmedia_500x250Exp'), disabled: true })
                 })
             }),
             exists: new FormArray([])
@@ -360,7 +393,7 @@ export class AppComponent implements OnInit {
         this.campaignEndDateComp = this.mainForm.get('campaignEndDate') as FormControl;
         this.addNewExit();
 
-        
+
     }
 
 
@@ -451,28 +484,7 @@ export class AppComponent implements OnInit {
         }
     }
 
-    onImportPHNX() {
-        if (this.phnxID.length >= 5) {
-            this.showProcessing = true;
-            this.formStatus = 'Getting Campaign...';
-            this._api.getData('api/am/creative-form/phnx/' + this.phnxID).subscribe((data: PhnxDownload) => {
-                console.log(data);
-                if (Object.keys(data).length > 0) {
-                    this.phnxData = data;
-                    this.buildForm();
-                    this.phnxIDValid = true;
-                } else {
-                    this.phnxIDErr = true;
-                }
 
-                this.showProcessing = false;
-                this.formStatus = 'Saving...';
-            });
-        } else {
-            this.phnxIDErr = true;
-        }
-
-    }
 
     processForm() {
         this.modalElm.hide();
@@ -499,11 +511,9 @@ export class AppComponent implements OnInit {
         this.sendData.campaignStartDate = this.formatDate(this.mainForm.get('campaignStartDate').value);
 
         console.log(this.sendData);
-        this._api.insertData('api/am/creative-form', this.sendData, false).subscribe(res => {
-
-            console.log(res);
+        this._api.insertData('api/am/creative-form/' + this.formID, this.sendData, false).subscribe(res => {
             if (this.filesToUpload.length > 0) {
-                this.startUpload(res);
+                this.startUpload();
             } else {
                 this.showProcessing = false;
                 this.showThankyou = true;
@@ -570,10 +580,10 @@ export class AppComponent implements OnInit {
         }
     }
 
-    startUpload(id): void {
+    startUpload(): void {
         const event: UploadInput = {
             type: 'uploadAll',
-            url: environment.API_URL + 'api/am/form-upload/' + id,
+            url: environment.API_URL + 'api/am/form-upload/' + this.formID,
             method: 'POST',
             data: { foo: 'bar' }
         };
@@ -709,9 +719,6 @@ export class AppComponent implements OnInit {
         }
     }
 
-    openModal(template) {
-        template.show();
-    }
 
     confirmModal() {
         if (!this.mainForm.get('crvNotes').value) {
@@ -725,5 +732,10 @@ export class AppComponent implements OnInit {
         this.modalElm.hide();
         const pageScrollInstance: PageScrollInstance = PageScrollInstance.simpleInstance(this.document, '#notesCreativesSet');
         this.pageScrollService.start(pageScrollInstance);
+    }
+
+
+    openModal(template: TemplateRef<any>) {
+        this.modalRef = this.modalService.show(template);
     }
 }
