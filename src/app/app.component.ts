@@ -34,7 +34,7 @@ export interface IcrvFormData {
     campaignAssetsDate: string;
     campaignEndDate: string;
     campaignMsgPrimary: string;
-    campaignMsgSecondary: string;
+    // campaignMsgSecondary: string;
     // campaignNotes: string;
     campaignStartDate: string;
     campaignTarget: string;
@@ -43,7 +43,7 @@ export interface IcrvFormData {
     crvVersions: number;
     executiveEmail: string;
     executiveName: string;
-    executivePhone: string;
+    // executivePhone: string;
     exists: any[];
 }
 
@@ -52,7 +52,7 @@ export interface IsendData {
     campaignAssetsDate: string;
     campaignEndDate: string;
     campaignMsgPrimary: string;
-    campaignMsgSecondary: string;
+    // campaignMsgSecondary: string;
     // campaignNotes: string;
     campaignStartDate: string;
     campaignTarget: string;
@@ -62,7 +62,7 @@ export interface IsendData {
     crvNotes: string;
     executiveEmail: string;
     executiveName: string;
-    executivePhone: string;
+    // executivePhone: string;
     exists: string;
     safeLater: IProjectSave;
     kpi: string;
@@ -118,6 +118,7 @@ export interface PhnxDownload {
 })
 export class AppComponent implements OnInit {
 
+    maintenanceOn = true;
     formID;
     showThankyou = false;
     phnxIDValid = false;
@@ -195,8 +196,12 @@ export class AppComponent implements OnInit {
         this.formHash$ = this.route.queryParams
             .subscribe((qparam: any) => {
                 if ('ref' in qparam) {
+                    console.log(qparam['ref']);
                     // load campaign
-                    // 
+                    // this._api.getData('api/am/continue-form/' + qparam['ref']).subscribe((data: PhnxDownload) => {
+
+
+                    // });
 
                 }
             });
@@ -321,22 +326,16 @@ export class AppComponent implements OnInit {
     }
 
     buildForm() {
-
-        console.log(this.phnxData.client);
         const baseData = {
             client: (this.phnxData.client) ? this.phnxData.client : { client_name: null }
         };
-
-        // if(this.phnxData.client)
-        console.log(baseData);
-
         const plus2Days = this.addRemoveDays(new Date(), 2);
         const stgDate = plus2Days.getMonth() + 1 + '/' + plus2Days.getDate() + '/' + plus2Days.getFullYear();
         this.mainForm = new FormGroup({
             executiveName: new FormControl({ value: (this.phnxData.sales_reps) ? this.phnxData.sales_reps.first_name + ' ' + this.phnxData.sales_reps.last_name : null, disabled: false }, [Validators.required]),
             executiveEmail: new FormControl({ value: (this.phnxData.sales_reps) ? this.phnxData.sales_reps.email : null, disabled: false }, [Validators.required, Validators.pattern(this.emailPattern)]),
             additionalEmails: new FormControl(null),
-            executivePhone: new FormControl(null, [Validators.required, Validators.pattern(this.phonePattern)]),
+            // executivePhone: new FormControl(null, [Validators.required, Validators.pattern(this.phonePattern)]),
             clientName: new FormControl({ value: baseData.client.client_name, disabled: (baseData.client.client_name) }, [Validators.required]),
             clientWebsite: new FormControl(null, [Validators.required]),
             campaignName: new FormControl({ value: this.phnxData.campaign_name, disabled: true }, [Validators.required]),
@@ -345,7 +344,7 @@ export class AppComponent implements OnInit {
             campaignEndDate: new FormControl({ value: (this.phnxData.media_plan) ? new Date(this.phnxData.media_plan.end_date) : null, disabled: false }, [Validators.required]),
             campaignAssetsDate: new FormControl(stgDate),
             campaignMsgPrimary: new FormControl(null, [Validators.required]),
-            campaignMsgSecondary: new FormControl(null),
+            // campaignMsgSecondary: new FormControl(null),
             campaignTarget: new FormControl(null, [Validators.required]),
             // campaignNotes: new FormControl(null),
             crvVersions: new FormControl(this.creativeCount),
@@ -476,13 +475,13 @@ export class AppComponent implements OnInit {
         this.crvVersionControl.setValue(count);
     }
 
-    checkChanged(event) {
-        if (event.target.checked) {
-            this.validCreatives = true;
-        } else {
-            this.validateCreatives();
-        }
-    }
+    // checkChanged(event) {
+    //     if (event.target.checked) {
+    //         this.validCreatives = true;
+    //     } else {
+    //         this.validateCreatives();
+    //     }
+    // }
 
 
 
@@ -500,7 +499,7 @@ export class AppComponent implements OnInit {
                 client_phnx_id: null
             };
         }
-
+        // console.log(this.phnxData);
         this.sendData.safeLater = Object.assign({}, this.phnxData);
         this.sendData.safeLater.creatives = this.extractCreatives();
         this.sendData.safeLater.owner = 'LIN';
@@ -510,7 +509,7 @@ export class AppComponent implements OnInit {
         this.sendData.campaignEndDate = this.formatDate(this.mainForm.get('campaignEndDate').value);
         this.sendData.campaignStartDate = this.formatDate(this.mainForm.get('campaignStartDate').value);
 
-        console.log(this.sendData);
+        // console.log(this.sendData);
         this._api.insertData('api/am/creative-form/' + this.formID, this.sendData, false).subscribe(res => {
             if (this.filesToUpload.length > 0) {
                 this.startUpload();
@@ -605,10 +604,10 @@ export class AppComponent implements OnInit {
     }
 
     extractCreatives() {
-        const obj: IcrvFormData = Object.assign({}, this.mainForm.value);
-        const rm = this.convertCreative(obj.creatives.richmedia, 'RichMedia');
-        const std = this.convertCreative(obj.creatives.standard, 'Standard');
-        const sta = this.convertCreative(obj.creatives.static, 'Static');
+        const obj = Object.assign({}, this.creativeGroup.value);
+        const rm = ('richmedia' in obj) ? this.convertCreative(obj.richmedia, 'RichMedia') : [];
+        const std = ('standard' in obj) ? this.convertCreative(obj.standard, 'Standard') : [];
+        const sta = ('static' in obj) ? this.convertCreative(obj.static, 'Static') : [];
 
         let allCrvs = [];
 

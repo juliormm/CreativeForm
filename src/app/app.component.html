@@ -10,7 +10,7 @@
     </div>
   </header>
 </div>
-<div class="container formBg">
+<div class="container formBg" *ngIf="!maintenanceOn">
   <section>
     <div class="row">
       <div class="col-sm-6 first">
@@ -39,7 +39,7 @@
             <div class="media-body">
               <div class="yelloHeading media-heading"> Digital Ad start times</div>
               Digital ad times start upon receiving necessary assets and signed IO.
-              <br><span class="redFont">Submissions after 1pm CST will begin next day.</span>
+              <br><span class="redFont">Submissions after 1pm CT will begin next day.</span>
             </div>
           </div>
         </div>
@@ -105,12 +105,12 @@
                   <input type="text" name="ae_email" id="executiveEmail" class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['executiveEmail'].invalid && showErrors}" formControlName="executiveEmail">
                 </div>
               </div>
-              <div class="col-sm-6">
+              <!--              <div class="col-sm-6">
                 <div class="form-group">
                   <label for="executivePhone">Account Executive Phone *</label>
                   <input type="text" name="ae_phone" id="executivePhone" class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['executivePhone'].invalid && showErrors}" formControlName="executivePhone">
                 </div>
-              </div>
+              </div> -->
             </div>
           </div>
           <div class="col-sm-6 last">
@@ -134,6 +134,7 @@
           <div class="col-sm-6 first">
             <div class="form-group">
               <label for="clientName">Client Name *</label>
+              <span tooltip="Title of Brand or Service being promoted" class="glyphicon glyphicon-question-sign"></span>
               <input type="text" name="client_name" class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['clientName'].invalid && showErrors}" id="clientName" formControlName="clientName">
             </div>
             <div class="form-group">
@@ -144,6 +145,7 @@
               <div class="col-sm-6">
                 <div class="form-group">
                   <label for="campaignKPI">Campaign KPI/Metric Goals *</label>
+                  <span tooltip="CRT, Views, Impressions, engagement, brand awareness, etc." class="glyphicon glyphicon-question-sign"></span>
                   <input type="text" name="campaign_kpi" class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['campaignKPI'].invalid && showErrors}" id="campaignKPI" formControlName="campaignKPI">
                 </div>
               </div>
@@ -173,22 +175,24 @@
             </div>
             <div class="form-group">
               <label for="clientWebsite">Client Website *</label>
+              <span tooltip="The client’s primary home page—used as a brand guide, additional assets, and general reference" class="glyphicon glyphicon-question-sign"></span>
               <input type="text" name="client_web" id="clientWebsite" class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['clientWebsite'].invalid && showErrors}" formControlName="clientWebsite">
             </div>
             <div class="form-group">
-              <label for="campaignMsgPrimary">Primary Message *
-                <!-- <span  tooltip="Info on Primary Message"class="glyphicon glyphicon-question-sign"></span> -->
+              <label for="campaignMsgPrimary">Copy Direction *
+                <span tooltip="Basic goals, taglines, deals or promotions, overview of brand voice, call-to-action. Need this for each set created. Also see additional notes at bottom of form" class="glyphicon glyphicon-question-sign"></span>
               </label>
-              <textarea class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['campaignMsgPrimary'].invalid && showErrors}" name="msg_primary" id="campaignMsgPrimary" rows="3" formControlName="campaignMsgPrimary"></textarea>
+              <textarea class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['campaignMsgPrimary'].invalid && showErrors}" name="msg_primary" id="campaignMsgPrimary" rows="6" formControlName="campaignMsgPrimary"></textarea>
             </div>
-            <div class="form-group extra-field">
+            <!--          <div class="form-group extra-field">
               <label for="secondaryMessage">Secondary Message</label>
               <textarea class="form-control" name="msg_secondary" id="secondaryMessage" rows="3" formControlName="campaignMsgSecondary"></textarea>
-            </div>
+            </div> -->
           </div>
           <div class="col-sm-6 last">
             <div class="form-group" id="clicksContainer">
               <label for="adClickThrough">Ad URL ClickThrough(s) Link</label>
+              <span tooltip="Please provide the main clickThrough URL or URLs for this campaign. You can title each link either for the creative set that reference and/or for multiple clickThroughs within a Rich Media execution (ex: Learn More, Facebook, Twitter)" class="glyphicon glyphicon-question-sign"></span>
               <div formArrayName="exists" *ngFor="let item of exitFormArray.controls; let i = index;">
                 <div class="input-group clickthroughs" [formGroupName]="i">
                   <span class="input-group-addon">Name</span>
@@ -212,6 +216,7 @@
             </div>
             <div class="form-group">
               <label for="campaignTarget">Target Audience/Market *</label>
+              <span tooltip="To whom are these ads communicating to, and what are we asking them to do? Ex: Women 33-44 with kids, Single Mom’s, Men 30-45, to provide email and receive coupon for purchase." class="glyphicon glyphicon-question-sign"></span>
               <textarea class="required-item form-control" [ngClass]="{'missingInfo': mainForm.controls['campaignTarget'].invalid && showErrors}" name="target_audience" id="campaignTarget" rows="3" formControlName="campaignTarget"></textarea>
             </div>
             <!--    <div class="form-group extra-field">
@@ -231,6 +236,7 @@
                   <div class="form-group">
                     <div class="dropdown numberVersions">
                       <label for="numVersions">Number of Versions</label>
+                      <span tooltip="If you are requesting more than 1-set of creative units for production, please indicate the number of versions here. Ex: Men, Women and Children, General would be 4-sets." class="glyphicon glyphicon-question-sign"></span>
                       <div class="btn-group" dropdown>
                         <button value="1" type="button" data-toggle="dropdown" id="numVersions" aria-haspopup="true" aria-expanded="false" class="btn dropdown-toggle">{{creativeCount}}</button>
                         <button type="button" data-toggle="dropdown" id="numVersionsCar" aria-haspopup="true" aria-expanded="false" class="btn dropdown-toggle" dropdownToggle>
@@ -286,39 +292,39 @@
                         <div class="row static_btn-row crv-type" [ngClass]="{'active': activeCrvType == 'static'}" formGroupName="static">
                           <div class="col-xs-6 col-md-4">
                             <div class="checkBoxFill">
-                              <input type="checkbox" id="stat_300x250" value="300x250" formControlName="static_300x250" name="static" (change)="checkChanged($event)" />
+                              <input type="checkbox" id="stat_300x250" value="300x250" formControlName="static_300x250" name="static" />
                               <label for="stat_300x250">300x250</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" id="stat_728x90" value="728x90" formControlName="static_728x90" name="static" (change)="checkChanged($event)" />
+                              <input type="checkbox" id="stat_728x90" value="728x90" formControlName="static_728x90" name="static" />
                               <label for="stat_728x90">728x90</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" id="stat_160x600" value="160x600" formControlName="static_160x600" name="static" (change)="checkChanged($event)" />
+                              <input type="checkbox" id="stat_160x600" value="160x600" formControlName="static_160x600" name="static" />
                               <label for="stat_160x600">160x600</label>
                             </div>
                           </div>
                           <div class="col-xs-6 col-md-4">
                             <div class="checkBoxFill">
-                              <input type="checkbox" id="stat_600x600" value="600x600" formControlName="static_600x600" name="static" (change)="checkChanged($event)" />
+                              <input type="checkbox" id="stat_600x600" value="600x600" formControlName="static_600x600" name="static" />
                               <label for="stat_600x600">600x600</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" id="stat_1200x444" value="1200x444" formControlName="static_1200x444" name="static" (change)="checkChanged($event)" />
+                              <input type="checkbox" id="stat_1200x444" value="1200x444" formControlName="static_1200x444" name="static" />
                               <label for="stat_1200x444">1200x444</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" id="stat_1200x628" value="1200x628" formControlName="static_1200x628" name="static" (change)="checkChanged($event)" />
+                              <input type="checkbox" id="stat_1200x628" value="1200x628" formControlName="static_1200x628" name="static" />
                               <label for="stat_1200x628">1200x628</label>
                             </div>
                           </div>
                           <div class="col-xs-6 col-md-4">
                             <div class="checkBoxFill">
-                              <input type="checkbox" id="stat_320x50" value="320x50" formControlName="static_320x50" name="static" (change)="checkChanged($event)" />
+                              <input type="checkbox" id="stat_320x50" value="320x50" formControlName="static_320x50" name="static" />
                               <label for="stat_320x50">320x50</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" id="stat_300x50" value="300x50" formControlName="static_300x50" name="static" (change)="checkChanged($event)" />
+                              <input type="checkbox" id="stat_300x50" value="300x50" formControlName="static_300x50" name="static" />
                               <label for="stat_300x50">300x50</label>
                             </div>
                           </div>
@@ -327,39 +333,39 @@
                         <div class="row std_btn-row crv-type" [ngClass]="{'active': activeCrvType == 'standard'}" formGroupName="standard">
                           <div class="col-xs-6 col-md-4">
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="300x250" formControlName="standard_300x50" id="std_300x250" name="standard" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="300x250" formControlName="standard_300x50" id="std_300x250" name="standard" />
                               <label for="std_300x250">300x250</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="728x90" formControlName="standard_728x90" id="std_728x90" name="standard" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="728x90" formControlName="standard_728x90" id="std_728x90" name="standard" />
                               <label for="std_728x90">728x90</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="160x600" formControlName="standard_160x600" id="std_160x600" name="standard" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="160x600" formControlName="standard_160x600" id="std_160x600" name="standard" />
                               <label for="std_160x600">160x600</label>
                             </div>
                           </div>
                           <div class="col-xs-6 col-md-4">
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="300x600" formControlName="standard_300x600" id="std_300x600" name="standard" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="300x600" formControlName="standard_300x600" id="std_300x600" name="standard" />
                               <label for="std_300x600">300x600</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="970x90" formControlName="standard_970x90" id="std_970x90" name="standard" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="970x90" formControlName="standard_970x90" id="std_970x90" name="standard" />
                               <label for="std_970x90">970x90</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="970x250" formControlName="standard_970x250" id="std_970x250" name="standard" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="970x250" formControlName="standard_970x250" id="std_970x250" name="standard" />
                               <label for="std_970x250">970x250</label>
                             </div>
                           </div>
                           <div class="col-xs-6 col-md-4">
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="320x50" formControlName="standard_320x50" id="std_320x50" name="standard" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="320x50" formControlName="standard_320x50" id="std_320x50" name="standard" />
                               <label for="std_320x50">320x50</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="300x50" formControlName="standard_300x50" id="std_300x50" name="standard" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="300x50" formControlName="standard_300x50" id="std_300x50" name="standard" />
                               <label for="std_300x50">300x50</label>
                             </div>
                           </div>
@@ -368,21 +374,21 @@
                         <div class="row rm_btn-row crv-type" [ngClass]="{'active': activeCrvType == 'richmedia'}" formGroupName="richmedia">
                           <div class="col-xs-6 col-md-4">
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="300x250" formControlName="richmedia_300x250" id="rm_300x250" name="richmedia" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="300x250" formControlName="richmedia_300x250" id="rm_300x250" name="richmedia" />
                               <label for="rm_300x250">300x250</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="728x90" formControlName="richmedia_728x90" id="rm_728x90" name="richmedia" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="728x90" formControlName="richmedia_728x90" id="rm_728x90" name="richmedia" />
                               <label for="rm_728x90">728x90</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="160x600" formControlName="richmedia_160x600" id="rm_160x600" name="richmedia" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="160x600" formControlName="richmedia_160x600" id="rm_160x600" name="richmedia" />
                               <label for="rm_160x600">160x600</label>
                             </div>
                           </div>
                           <div class="col-xs-6 col-md-4">
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="300x600" formControlName="richmedia_300x600" id="rm_300x600" name="richmedia" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="300x600" formControlName="richmedia_300x600" id="rm_300x600" name="richmedia" />
                               <label for="rm_300x600">300x600</label>
                             </div>
                             <div class="checkBoxFill">
@@ -390,17 +396,17 @@
                               <label for="rm_970x250">970x250</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="300x600_Exp" formControlName="richmedia_300x600Exp" id="rm_300x600_Exp" name="richmedia" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="300x600_Exp" formControlName="richmedia_300x600Exp" id="rm_300x600_Exp" name="richmedia" />
                               <label for="rm_300x600_Exp">300x600_Exp</label>
                             </div>
                           </div>
                           <div class="col-xs-6 col-md-4">
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="728x315_Exp" formControlName="richmedia_728x315Exp" id="rm_728x315_Exp" name="richmedia" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="728x315_Exp" formControlName="richmedia_728x315Exp" id="rm_728x315_Exp" name="richmedia" />
                               <label for="rm_728x315_Exp">728x315_Exp</label>
                             </div>
                             <div class="checkBoxFill">
-                              <input type="checkbox" value="500x250_Exp" formControlName="richmedia_500x250Exp" id="rm_500x250_Exp" name="richmedia" (change)="checkChanged($event)" />
+                              <input type="checkbox" value="500x250_Exp" formControlName="richmedia_500x250Exp" id="rm_500x250_Exp" name="richmedia" />
                               <label for="rm_500x250_Exp">500x250_Exp</label>
                             </div>
                           </div>
@@ -412,7 +418,22 @@
                     <div class="col-sm-12">
                       <div class="form-group">
                         <label for="notesCreativesSet">Additional Notes or Asset Link</label>
+                        <span tooltip="Provide any further insight you feel may be helpful in the creative process. This field may also be used to provide any asset download links (Dropbox, Google Drive, WeTransfer, etc.) from the client in addition to, or in place of directly uploaded assets within the tool" class="glyphicon glyphicon-question-sign"></span>
                         <textarea class="form-control" name="" id="notesCreativesSet" rows="5" formControlName="crvNotes"></textarea>
+                      </div>
+                      <label class="btn btn-block btn-file lg_ylwBtn">
+                        <img class="iconBtn" src="./assets/images/upload_icon.png">Upload Asset Files
+                        <input type="file" ngFileSelect [options]="uploadOptions" (uploadOutput)="onUploadOutput($event)" [uploadInput]="uploadInput" style="display: none;" multiple>
+                      </label>
+                      <div class="form-group">
+                        <div class="uploadResults small text-muted" id="filesUploadStat" *ngIf="filesToUpload.length > 0">
+                          <ul class="listFilesUpload">
+                            <li class="uploadFileName" *ngFor="let item of filesToUpload; let i = index;" (click)="removeFile(item.id)">
+                              <span class="glyfChange glyphicon glyphicon-file"></span> {{item.name}} {{overMine}}
+                              <span class="pull-right glyfChange glyphicon glyphicon-remove"></span>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -445,9 +466,25 @@
     </div>
   </div>
 </div>
+<div class="container formBg" *ngIf="maintenanceOn">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2 text-center">
+      <div class="jumbotron">
+        <h2>The form is currently offline.</h2>
+        <p>Follow current process through PHNX with your Account Manager until the final form is activated.
+          
+      </p>
+      <p>
+        Thank you.
+      </p>
+    </div>
+    </div>
+  </div>
+  
+</div>
 <footer class="footer"></footer>
 <div class="stick">
-  <a class="btn btn-danger btn-sm" href="mailto:creativeproduction@hyfnlocal.com?subject=Creative%20Form%20Issue&amp;body=Please%20describe%20the%20issue:"> <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Report Issue</a>
+    <a class="btn btn-danger btn-sm" href="mailto:creativeproduction@hyfnlocal.com?subject=Creative%20Form%20Issue&amp;body=Please%20describe%20the%20issue:"> <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Report Issue</a>
 </div>
 <div id="loader-wrapper" *ngIf="showProcessing">
   <div id="loader-center">
@@ -510,20 +547,6 @@
         <li>Previous work samples</li>
         <li>Client provided copy, mapping out basic messaging and final CTA</li>
       </ul>
-      <label class="btn btn-block btn-file lg_ylwBtn" *ngIf="phnxIDValid">
-        <img class="iconBtn" src="./assets/images/upload_icon.png">Upload Files
-        <input type="file" ngFileSelect [options]="uploadOptions" (uploadOutput)="onUploadOutput($event)" [uploadInput]="uploadInput" style="display: none;" multiple>
-      </label>
-      <div class="form-group">
-        <div class="uploadResults small text-muted" id="filesUploadStat" *ngIf="filesToUpload.length > 0">
-          <ul class="listFilesUpload">
-            <li class="uploadFileName" *ngFor="let item of filesToUpload; let i = index;" (click)="removeFile(item.id)">
-              <span class="glyfChange glyphicon glyphicon-file"></span> {{item.name}} {{overMine}}
-              <span class="pull-right glyfChange glyphicon glyphicon-remove"></span>
-            </li>
-          </ul>
-        </div>
-      </div>
       <!-- Best Practices  -->
       <section>
         <div class="row section-padding">
@@ -544,11 +567,6 @@
     </div>
   </div>
 </ng-template>
-
-
-
-
-
 <ng-template #errorMessages>
   <div class="modal-header">
     <h4 class="modal-title pull-left">{{errHeader}}</h4>

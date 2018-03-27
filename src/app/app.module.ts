@@ -6,7 +6,8 @@ import { HttpModule } from '@angular/http';
 import { AppRoutingModule } from './app-routing';
 
 import { ApiService } from './api.service'; 
- 
+
+
 import { NgUploaderModule } from 'ngx-uploader';
 import { ProgressbarModule,  } from 'ngx-bootstrap/progressbar';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
